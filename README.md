@@ -1,97 +1,102 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Espresso – React Native Restaurant Ops & Guest App
 
-# Getting Started
+Espresso is a production-ready React Native (TypeScript) application built with the React Native CLI. It powers the daily guest, staff, and owner workflows for a hospitality team.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- **Role-based experience** – Switch between Guest, Staff, and Owner flows from the role gate.
+- **Guest journey** – Collect profile details, check party size, confirm check-in, and review previous visits or offers.
+- **Staff tools** – Manage personal/public notices, send broadcasts, track the live floor, and operate the waitlist and inbox.
+- **Owner insights** – Real-time dashboard with sparkline trends, visit ledger, offer analytics, and restaurant settings.
+- **Mock API client** – Toggleable mock data layer (`USE_MOCK=true`) backed by an offline queue using AsyncStorage.
+- **Push-ready scaffolding** – Firebase Cloud Messaging registration & topic placeholders.
+- **Offline resilience** – Banner showing offline state or pending replay queue.
+- **Testing & quality** – Jest + React Native Testing Library, ESLint, Prettier, and Husky pre-commit hook.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Project structure
 
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+```
+src/
+  api/          // typed API client and mock data
+  components/   // shared UI components (cards, sparklines, etc.)
+  hooks/        // polling + bootstrap hooks
+  navigation/   // role/tab navigators and route typing
+  screens/      // guest, staff, and owner experiences
+  store/        // zustand global store slices
+  theme/        // light/dark theming with Espresso branding
+  utils/        // formatting helpers
 ```
 
-## Step 2: Build and run your app
+## Prerequisites
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+- Node.js 20+
+- React Native CLI environment (Android Studio and/or Xcode toolchain)
+- CocoaPods (`bundle install && bundle exec pod install` inside `ios/` for iOS builds)
 
-### Android
+## Installation
 
 ```sh
-# Using npm
+npm install
+npm run prepare # installs Husky hooks
+```
+
+## Running the app
+
+Start Metro bundler:
+
+```sh
+npm start
+```
+
+In another terminal build & run:
+
+```sh
+# Android (USB device or emulator)
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# iOS (from macOS)
+npx pod-install ios
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+Environment variables can be provided via Metro using `.env` or directly in the shell. The mock API is enabled by default (`USE_MOCK=true`).
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Testing & linting
 
-## Step 3: Modify your app
+```sh
+npm run lint
+npm run test
+npm run typecheck
+```
 
-Now that you have successfully run the app, let's make changes!
+The Husky pre-commit hook runs `npm run lint` and `npm run test` automatically.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Firebase Cloud Messaging
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+The app includes scaffolding for `@react-native-firebase/messaging`. To enable push notifications:
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+1. Configure a Firebase project and add the iOS/Android native setup (Google Services files and initialization code).
+2. Provide real topic names (e.g., `restaurant/{id}/broadcasts`) in `SettingsScreen` or environment config.
+3. Update `useAppBootstrap` with logic to persist tokens to your backend via the API client.
 
-## Congratulations! :tada:
+## Offline & demo mode
 
-You've successfully run and modified your React Native App. :partying_face:
+- Set `USE_MOCK=true` (default) for the in-memory mock data that powers demo flows.
+- Offline mutations are queued via AsyncStorage; when connectivity returns, the app replays them and displays a banner.
 
-### Now what?
+## Deep links
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+The navigation container handles the following URIs:
 
-# Troubleshooting
+- `espresso://offer/{offerId}` → Offer detail screen
+- `espresso://visit/{visitId}` → Visit detail screen
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+Use `xcrun simctl openurl booted espresso://offer/offer-1` to test on iOS simulators.
 
-# Learn More
+## Accessibility & theming
 
-To learn more about React Native, take a look at the following resources:
+All interactive elements include accessibility labels and the UI adapts automatically to the system light/dark mode using the Espresso brand palette (primary `#6C3B2A`, accent `#F3B34C`).
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+Happy brewing!
