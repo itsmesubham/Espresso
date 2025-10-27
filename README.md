@@ -1,97 +1,153 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Espresso - Restaurant Ops & Guest App
 
-# Getting Started
+A production-ready React Native (TypeScript) app for restaurant operations and guest experiences.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- Guest onboarding with party size selection
+- Staff communication tools (personal and public notices)
+- Owner dashboard with real-time metrics
+- Push notifications and broadcasts
+- Offline support with queued mutations
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Tech Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- React Native CLI (no Expo)
+- TypeScript
+- @react-navigation/native
+- Zustand for state management
+- React Native Reanimated
+- Axios for networking
+- React Hook Form + Zod for validation
+- Firebase Cloud Messaging for push notifications
+- AsyncStorage for local storage
 
-```sh
-# Using npm
-npm start
+## Brand Colors
 
-# OR using Yarn
-yarn start
+- Primary: #6C3B2A (Espresso)
+- Accent: #F3B34C (Gold)
+- Surface: #FFF8F2 (Light Cream)
+
+## Project Setup
+
+### Prerequisites
+
+- Node.js (v20+)
+- React Native CLI
+- Xcode (for iOS) or Android Studio (for Android)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd Espresso
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+2. Install dependencies:
+```bash
+npm install
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+3. For iOS, install pods:
+```bash
+cd ios && pod install && cd ..
 ```
 
-Then, and every time you update your native dependencies, run:
+### Running the App
 
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+#### iOS
+```bash
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+#### Android
+```bash
+npm run android
+```
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Environment Variables
 
-## Step 3: Modify your app
+Create a `.env` file in the project root:
 
-Now that you have successfully run the app, let's make changes!
+```
+API_BASE_URL=http://localhost:3000/api
+USE_MOCK=true
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### Push Notifications Setup
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+For push notifications, you'll need to:
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+1. Follow the Firebase documentation to set up an FCM project
+2. Add your `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) files
+3. Configure notification handling in the app
 
-## Congratulations! :tada:
+### Development
 
-You've successfully run and modified your React Native App. :partying_face:
+To run in development mode with live reloading:
+```bash
+npm start
+```
 
-### Now what?
+To run tests:
+```bash
+npm test
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+To lint:
+```bash
+npm run lint
+```
 
-# Troubleshooting
+## Project Structure
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+```
+src/
+├── app.tsx
+├── navigation/
+├── screens/
+│   ├── guest/
+│   ├── staff/
+│   └── owner/
+├── components/
+├── api/
+├── store/
+├── theme/
+├── utils/
+├── hooks/
+└── types/
+```
 
-# Learn More
+## Roles
 
-To learn more about React Native, take a look at the following resources:
+- Guest: Check in, view previous visits, receive offers
+- Staff: Send notices, manage floor, handle waitlist
+- Owner: View real-time metrics, manage offers, configure settings
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## API Integration
+
+The app uses a mock API by default. To connect to a real backend:
+
+1. Set `USE_MOCK=false` in your environment
+2. Update `API_BASE_URL` to point to your backend service
+3. Implement the API endpoints as specified in the requirements
+
+## Testing
+
+Run unit tests:
+```bash
+npm test
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+MIT
