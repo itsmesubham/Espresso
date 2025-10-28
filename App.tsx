@@ -40,18 +40,31 @@ const restaurantStorage = {
 // Screen components
 const HomeScreen = ({ onNavigate }: { onNavigate: (screen: string) => void }) => {
   const isDarkMode = useColorScheme() === 'dark';
+  const [activeTile, setActiveTile] = useState<string | null>(null);
   
-  const tiles = [
-    { id: 'check-in', title: 'Customer Check-In', icon: '👤', color: '#3b82f6' },
-    { id: 'tables', title: 'Table Management', icon: '🍽️', color: '#10b981' },
-    { id: 'orders', title: 'Order Management', icon: '📋', color: '#8b5cf6' },
-    { id: 'reservations', title: 'Reservations', icon: '📅', color: '#f59e0b' },
-    { id: 'reports', title: 'Reports', icon: '📊', color: '#ef4444' },
-    { id: 'settings', title: 'Settings', icon: '⚙️', color: '#6b7280' },
+  // Restaurant metrics mock data
+  const [metrics] = useState({
+    availableTables: 8,
+    occupiedTables: 12,
+    pendingOrders: 5,
+    todayRevenue: 2450,
+    reservationsToday: 3
+  });
+  
+
+  
+  const quickActions = [
+    { id: 'quick-checkin', title: 'Quick Check-In', icon: '🏃', action: () => onNavigate('check-in') },
+    { id: 'view-orders', title: 'View Orders', icon: '👀', action: () => onNavigate('orders') },
+    { id: 'manage-tables', title: 'Manage Tables', icon: '🪑', action: () => onNavigate('tables') },
   ];
   
   const titleStyle = {
     color: isDarkMode ? '#f8fafc' : '#0f172a',
+  };
+  
+  const subtitleStyle = {
+    color: isDarkMode ? '#cbd5e1' : '#64748b',
   };
   
   const containerStyle = {
@@ -61,24 +74,325 @@ const HomeScreen = ({ onNavigate }: { onNavigate: (screen: string) => void }) =>
   return (
     <SafeAreaView style={[styles.screenContainer, containerStyle]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView contentContainerStyle={styles.screenContent}>
-        <View style={styles.header}>
-          <Text style={[styles.headerTitle, titleStyle]}>Filter Cafe</Text>
-          <Text style={styles.headerSubtitle}>Restaurant Management System</Text>
+      <ScrollView 
+        contentContainerStyle={styles.screenContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Restaurant Card with Status */}
+        <View style={[
+          styles.restaurantCard,
+          isDarkMode ? styles.restaurantCardDark : styles.restaurantCardLight
+        ]}>
+          <View style={styles.restaurantCardContent}>
+            <View style={styles.restaurantStatusIndicator}>
+              <View style={styles.statusCircleOpen} />
+              <Text style={styles.statusText}>Open Now</Text>
+            </View>
+            <Text style={styles.restaurantIcon}>☕</Text>
+            <Text style={styles.restaurantName}>Filter Cafe</Text>
+            <Text style={styles.restaurantSubtitle}>Restaurant Management System</Text>
+          </View>
         </View>
         
-        <View style={styles.tilesContainer}>
-          {tiles.map((tile) => (
-            <TouchableOpacity
-              key={tile.id}
-              style={[styles.tile, { backgroundColor: tile.color }]}
-              onPress={() => onNavigate(tile.id)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.tileIcon}>{tile.icon}</Text>
-              <Text style={styles.tileTitle}>{tile.title}</Text>
-            </TouchableOpacity>
-          ))}
+        {/* Quick Stats Card */}
+        <View style={[
+          styles.statsCard,
+          isDarkMode ? styles.statsCardDark : styles.statsCardLight
+        ]}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{metrics.availableTables}</Text>
+            <Text style={[styles.statLabel, subtitleStyle]}>Available</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{metrics.pendingOrders}</Text>
+            <Text style={[styles.statLabel, subtitleStyle]}>Orders</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>$ {metrics.todayRevenue}</Text>
+            <Text style={[styles.statLabel, subtitleStyle]}>Today</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{metrics.reservationsToday}</Text>
+            <Text style={[styles.statLabel, subtitleStyle]}>Reservations</Text>
+          </View>
+        </View>
+        
+        {/* Today's Summary */}
+        <View style={[
+          styles.todaySummaryCard,
+          isDarkMode ? styles.todaySummaryCardDark : styles.todaySummaryCardLight
+        ]}>
+          <View style={styles.todaySummaryHeader}>
+            <Text style={[styles.todaySummaryTitle, titleStyle]}>Today's Summary</Text>
+            <Text style={[styles.todaySummaryDate, subtitleStyle]}>Today</Text>
+          </View>
+          
+          <View style={styles.todaySummaryContent}>
+            <View style={styles.todaySummaryItem}>
+              <Text style={styles.todaySummaryValue}>18</Text>
+              <Text style={[styles.todaySummaryLabel, subtitleStyle]}>Guests served</Text>
+            </View>
+            <View style={styles.todaySummaryItem}>
+              <Text style={styles.todaySummaryValue}>$1,420</Text>
+              <Text style={[styles.todaySummaryLabel, subtitleStyle]}>Revenue</Text>
+            </View>
+            <View style={styles.todaySummaryItem}>
+              <Text style={styles.todaySummaryValue}>38m</Text>
+              <Text style={[styles.todaySummaryLabel, subtitleStyle]}>Avg wait</Text>
+            </View>
+          </View>
+        </View>
+        
+        {/* Quick Actions */}
+        <View style={styles.quickActionsContainer}>
+          <Text style={[styles.quickActionsTitle, titleStyle]}>Quick Actions</Text>
+          <View style={styles.quickActionsList}>
+            {quickActions.map((action) => (
+              <TouchableOpacity 
+                key={action.id}
+                style={[
+                  styles.quickActionItem,
+                  isDarkMode ? styles.quickActionItemDark : styles.quickActionItemLight
+                ]}
+                onPress={action.action}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.quickActionIcon}>{action.icon}</Text>
+                <Text style={[styles.quickActionTitle, titleStyle]}>{action.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+        {/* Staff on Duty */}
+        <View style={[
+          styles.staffCard,
+          isDarkMode ? styles.staffCardDark : styles.staffCardLight
+        ]}>
+          <View style={styles.staffHeader}>
+            <Text style={[styles.staffTitle, titleStyle]}>Staff on Duty</Text>
+            <Text style={[styles.staffCount, subtitleStyle]}>3 of 5</Text>
+          </View>
+          <View style={styles.staffList}>
+            <View style={styles.staffItem}>
+              <View style={styles.staffAvatar}>
+                <Text style={styles.staffInitial}>JD</Text>
+              </View>
+              <View style={styles.staffInfo}>
+                <Text style={[styles.staffName, titleStyle]}>John D.</Text>
+                <Text style={[styles.staffRole, subtitleStyle]}>Manager</Text>
+              </View>
+              <View style={styles.staffStatusActive} />
+            </View>
+            <View style={styles.staffItem}>
+              <View style={styles.staffAvatar}>
+                <Text style={styles.staffInitial}>SM</Text>
+              </View>
+              <View style={styles.staffInfo}>
+                <Text style={[styles.staffName, titleStyle]}>Sarah M.</Text>
+                <Text style={[styles.staffRole, subtitleStyle]}>Waitress</Text>
+              </View>
+              <View style={styles.staffStatusActive} />
+            </View>
+            <View style={styles.staffItem}>
+              <View style={styles.staffAvatar}>
+                <Text style={styles.staffInitial}>MR</Text>
+              </View>
+              <View style={styles.staffInfo}>
+                <Text style={[styles.staffName, titleStyle]}>Mike R.</Text>
+                <Text style={[styles.staffRole, subtitleStyle]}>Cook</Text>
+              </View>
+              <View style={styles.staffStatusInactive} />
+            </View>
+          </View>
+        </View>
+        
+        <View style={styles.managementSection}>
+          <Text style={[styles.sectionTitle, titleStyle]}>Management</Text>
+          
+          {/* Operations Group */}
+          <View style={styles.groupContainer}>
+            <Text style={[styles.groupTitle, titleStyle]}>Operations</Text>
+            <View style={styles.groupGrid}>
+              {/* Customer Check-In */}
+              <TouchableOpacity
+                key="check-in"
+                style={[
+                  styles.groupTile,
+                  isDarkMode ? styles.groupTileDark : styles.groupTileLight,
+                  styles.checkInTile,
+                  activeTile === 'check-in' ? styles.tilePressed : null
+                ]}
+                onPress={() => onNavigate('check-in')}
+                activeOpacity={0.85}
+                onPressIn={() => setActiveTile('check-in')}
+                onPressOut={() => setActiveTile(null)}
+              >
+                <View style={[styles.groupTileHeader, styles.checkInHeader]}>
+                  <View style={styles.tileIconContainer}>
+                    <Text style={styles.tileIcon}>👤</Text>
+                  </View>
+                </View>
+                <View style={styles.groupTileContent}>
+                  <Text style={[styles.tileTitle, titleStyle]}>Check-In</Text>
+                  <Text style={[styles.tileSubtitle, subtitleStyle]}>Register guests</Text>
+                </View>
+              </TouchableOpacity>
+              
+              {/* Table Management */}
+              <TouchableOpacity
+                key="tables"
+                style={[
+                  styles.groupTile,
+                  isDarkMode ? styles.groupTileDark : styles.groupTileLight,
+                  styles.tablesTile,
+                  activeTile === 'tables' ? styles.tilePressed : null
+                ]}
+                onPress={() => onNavigate('tables')}
+                activeOpacity={0.85}
+                onPressIn={() => setActiveTile('tables')}
+                onPressOut={() => setActiveTile(null)}
+              >
+                <View style={[styles.groupTileHeader, styles.tablesHeader]}>
+                  <View style={styles.tileIconContainer}>
+                    <Text style={styles.tileIcon}>🍽️</Text>
+                  </View>
+                  <View style={styles.tileBadge}>
+                    <Text style={styles.tileBadgeText}>{metrics.availableTables}</Text>
+                  </View>
+                </View>
+                <View style={styles.groupTileContent}>
+                  <Text style={[styles.tileTitle, titleStyle]}>Tables</Text>
+                  <Text style={[styles.tileSubtitle, subtitleStyle]}>Manage seats</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          
+          {/* Orders & Reservations Group */}
+          <View style={styles.groupContainer}>
+            <Text style={[styles.groupTitle, titleStyle]}>Orders & Reservations</Text>
+            <View style={styles.groupGrid}>
+              {/* Order Management */}
+              <TouchableOpacity
+                key="orders"
+                style={[
+                  styles.groupTile,
+                  isDarkMode ? styles.groupTileDark : styles.groupTileLight,
+                  styles.ordersTile,
+                  activeTile === 'orders' ? styles.tilePressed : null
+                ]}
+                onPress={() => onNavigate('orders')}
+                activeOpacity={0.85}
+                onPressIn={() => setActiveTile('orders')}
+                onPressOut={() => setActiveTile(null)}
+              >
+                <View style={[styles.groupTileHeader, styles.ordersHeader]}>
+                  <View style={styles.tileIconContainer}>
+                    <Text style={styles.tileIcon}>📋</Text>
+                  </View>
+                  <View style={styles.tileBadge}>
+                    <Text style={styles.tileBadgeText}>{metrics.pendingOrders}</Text>
+                  </View>
+                </View>
+                <View style={styles.groupTileContent}>
+                  <Text style={[styles.tileTitle, titleStyle]}>Orders</Text>
+                  <Text style={[styles.tileSubtitle, subtitleStyle]}>Track orders</Text>
+                </View>
+              </TouchableOpacity>
+              
+              {/* Reservations */}
+              <TouchableOpacity
+                key="reservations"
+                style={[
+                  styles.groupTile,
+                  isDarkMode ? styles.groupTileDark : styles.groupTileLight,
+                  styles.reservationsTile,
+                  activeTile === 'reservations' ? styles.tilePressed : null
+                ]}
+                onPress={() => onNavigate('reservations')}
+                activeOpacity={0.85}
+                onPressIn={() => setActiveTile('reservations')}
+                onPressOut={() => setActiveTile(null)}
+              >
+                <View style={[styles.groupTileHeader, styles.reservationsHeader]}>
+                  <View style={styles.tileIconContainer}>
+                    <Text style={styles.tileIcon}>📅</Text>
+                  </View>
+                  <View style={styles.tileBadge}>
+                    <Text style={styles.tileBadgeText}>{metrics.reservationsToday}</Text>
+                  </View>
+                </View>
+                <View style={styles.groupTileContent}>
+                  <Text style={[styles.tileTitle, titleStyle]}>Reservations</Text>
+                  <Text style={[styles.tileSubtitle, subtitleStyle]}>Book tables</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          
+          {/* Analytics & Settings Group */}
+          <View style={styles.groupContainer}>
+            <Text style={[styles.groupTitle, titleStyle]}>Analytics & Settings</Text>
+            <View style={styles.groupGrid}>
+              {/* Reports */}
+              <TouchableOpacity
+                key="reports"
+                style={[
+                  styles.groupTile,
+                  isDarkMode ? styles.groupTileDark : styles.groupTileLight,
+                  styles.reportsTile,
+                  activeTile === 'reports' ? styles.tilePressed : null
+                ]}
+                onPress={() => onNavigate('reports')}
+                activeOpacity={0.85}
+                onPressIn={() => setActiveTile('reports')}
+                onPressOut={() => setActiveTile(null)}
+              >
+                <View style={[styles.groupTileHeader, styles.reportsHeader]}>
+                  <View style={styles.tileIconContainer}>
+                    <Text style={styles.tileIcon}>📊</Text>
+                  </View>
+                </View>
+                <View style={styles.groupTileContent}>
+                  <Text style={[styles.tileTitle, titleStyle]}>Reports</Text>
+                  <Text style={[styles.tileSubtitle, subtitleStyle]}>Analytics</Text>
+                </View>
+              </TouchableOpacity>
+              
+              {/* Settings */}
+              <TouchableOpacity
+                key="settings"
+                style={[
+                  styles.groupTile,
+                  isDarkMode ? styles.groupTileDark : styles.groupTileLight,
+                  styles.settingsTile,
+                  activeTile === 'settings' ? styles.tilePressed : null
+                ]}
+                onPress={() => onNavigate('settings')}
+                activeOpacity={0.85}
+                onPressIn={() => setActiveTile('settings')}
+                onPressOut={() => setActiveTile(null)}
+              >
+                <View style={[styles.groupTileHeader, styles.settingsHeader]}>
+                  <View style={styles.tileIconContainer}>
+                    <Text style={styles.tileIcon}>⚙️</Text>
+                  </View>
+                </View>
+                <View style={styles.groupTileContent}>
+                  <Text style={[styles.tileTitle, titleStyle]}>Settings</Text>
+                  <Text style={[styles.tileSubtitle, subtitleStyle]}>Configure</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        
+        <View style={[
+          styles.welcomeCard,
+          isDarkMode ? styles.welcomeCardDark : styles.welcomeCardLight
+        ]}>
+          <Text style={[styles.welcomeTitle, titleStyle]}>Welcome Back!</Text>
+          <Text style={[styles.welcomeSubtitle, subtitleStyle]}>Ready to manage your restaurant operations?</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -568,21 +882,433 @@ const styles = StyleSheet.create({
   },
   screenContent: {
     padding: 20,
+    paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
     marginBottom: 30,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
     textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#64748b',
     textAlign: 'center',
+    opacity: 0.8,
+  },
+  restaurantCard: {
+    width: '100%',
+    borderRadius: 20,
+    padding: 25,
+    marginBottom: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
+  restaurantCardGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 20,
+    opacity: 0.9,
+  },
+  restaurantCardContent: {
+    zIndex: 1,
+    alignItems: 'center',
+  },
+  restaurantStatusIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  statusCircleOpen: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#10b981',
+    marginRight: 8,
+  },
+  statusText: {
+    fontSize: 14,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  restaurantIcon: {
+    fontSize: 60,
+    marginBottom: 15,
+  },
+  restaurantName: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  restaurantSubtitle: {
+    fontSize: 16,
+    color: '#ffffff',
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  restaurantCardLight: {
+    backgroundColor: '#3b82f6',
+    shadowColor: '#3b82f6',
+  },
+  restaurantCardDark: {
+    backgroundColor: '#1e293b',
+    shadowColor: '#000',
+  },
+  welcomeCardLight: {
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+  },
+  welcomeCardDark: {
+    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    borderColor: 'rgba(30, 41, 59, 0.3)',
+  },
+  tileEven: {
+    marginLeft: 0,
+    marginRight: 8,
+  },
+  tileOdd: {
+    marginLeft: 8,
+    marginRight: 0,
+  },
+  tilePressed: {
+    transform: [{ scale: 0.95 }],
+  },
+  statsCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  statsCardLight: {
+    backgroundColor: '#ffffff',
+  },
+  statsCardDark: {
+    backgroundColor: '#1e293b',
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+    padding: 8,
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#3b82f6',
+  },
+  statLabel: {
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  quickActionsContainer: {
+    marginBottom: 20,
+  },
+  quickActionsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  quickActionsList: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  quickActionItem: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginHorizontal: 4,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  quickActionItemLight: {
+    backgroundColor: '#ffffff',
+  },
+  quickActionItemDark: {
+    backgroundColor: '#1e293b',
+  },
+  quickActionIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  quickActionTitle: {
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  tileBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#ef4444',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  tileBadgeText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  todaySummaryCard: {
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  todaySummaryCardLight: {
+    backgroundColor: '#ffffff',
+  },
+  todaySummaryCardDark: {
+    backgroundColor: '#1e293b',
+  },
+  todaySummaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  todaySummaryTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  todaySummaryDate: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  todaySummaryContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  todaySummaryItem: {
+    alignItems: 'center',
+    flex: 1,
+    padding: 8,
+  },
+  todaySummaryValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#10b981',
+  },
+  todaySummaryLabel: {
+    fontSize: 12,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  staffCard: {
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  staffCardLight: {
+    backgroundColor: '#ffffff',
+  },
+  staffCardDark: {
+    backgroundColor: '#1e293b',
+  },
+  staffHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  staffTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  staffCount: {
+    fontSize: 14,
+  },
+  staffList: {
+    flexDirection: 'column',
+  },
+  staffItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  staffAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  staffInitial: {
+    color: '#ffffff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  staffInfo: {
+    flex: 1,
+  },
+  staffName: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  staffRole: {
+    fontSize: 12,
+  },
+  staffStatusActive: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#10b981',
+  },
+  staffStatusInactive: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#94a3b8',
+  },
+  managementSection: {
+    marginBottom: 20,
+  },
+  managementGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  managementTile: {
+    width: '48%',
+    borderRadius: 16,
+    marginBottom: 16,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  tileTopGradient: {
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  groupContainer: {
+    marginBottom: 20,
+  },
+  groupTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  groupGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  groupTile: {
+    width: '48%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  groupTileHeader: {
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  groupTileContent: {
+    padding: 12,
+    alignItems: 'center',
+  },
+  groupTileLight: {
+    backgroundColor: '#ffffff',
+  },
+  groupTileDark: {
+    backgroundColor: '#1e293b',
+  },
+  checkInTile: {
+    shadowColor: '#3b82f6',
+  },
+  tablesTile: {
+    shadowColor: '#10b981',
+  },
+  ordersTile: {
+    shadowColor: '#8b5cf6',
+  },
+  reservationsTile: {
+    shadowColor: '#f59e0b',
+  },
+  reportsTile: {
+    shadowColor: '#ef4444',
+  },
+  settingsTile: {
+    shadowColor: '#6b7280',
+  },
+  checkInHeader: {
+    backgroundColor: '#3b82f6',
+  },
+  tablesHeader: {
+    backgroundColor: '#10b981',
+  },
+  ordersHeader: {
+    backgroundColor: '#8b5cf6',
+  },
+  reservationsHeader: {
+    backgroundColor: '#f59e0b',
+  },
+  reportsHeader: {
+    backgroundColor: '#ef4444',
+  },
+  settingsHeader: {
+    backgroundColor: '#6b7280',
+  },
+  tileIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -597,29 +1323,70 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    marginBottom: 30,
   },
-  tile: {
+  excitinTile: {
     width: '48%',
-    aspectRatio: 1,
-    borderRadius: 16,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    aspectRatio: 1.1,
+    borderRadius: 20,
     marginBottom: 16,
-    elevation: 4,
+    overflow: 'hidden',
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+  },
+  tileGradient: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: 18,
+    borderBottomWidth: 4,
+  },
+  tileContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tileTextContainer: {
+    flex: 1,
+    marginLeft: 12,
   },
   tileIcon: {
-    fontSize: 32,
-    marginBottom: 12,
+    fontSize: 36,
   },
   tileTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  tileSubtitle: {
+    fontSize: 12,
+  },
+  tileArrow: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+  },
+  tileArrowText: {
+    fontSize: 20,
     color: '#ffffff',
+    opacity: 0.8,
+  },
+  welcomeCard: {
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+  },
+  welcomeTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  welcomeSubtitle: {
+    fontSize: 14,
     textAlign: 'center',
   },
   formContainer: {
